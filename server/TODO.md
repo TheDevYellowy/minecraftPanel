@@ -4,7 +4,7 @@
     - [ ] Auth
     - [ ] Remove Zombie Connections
     - [ ] Create password for server
-  - [x] Modpack
+  - [ ] Modpack
     - [x] Download ( Not yet added to index )
     - [ ] Save pack version
     - [ ] Save pack modloader
