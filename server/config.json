@@ -1,4 +1,3 @@
 {
-    "serverName": "server.jar",
-    "autoAcceptEULA": false
+  "restart": false
 }

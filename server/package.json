@@ -1,0 +1,13 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "cli-progress": "^3.12.0",
+    "decompress": "^4.2.1",
+    "request": "^2.88.2",
+    "request-progress": "^3.0.0",
+    "ws": "^8.16.0"
+  }
+}

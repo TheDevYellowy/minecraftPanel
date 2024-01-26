@@ -1,0 +1,20 @@
+- [ ] Server Re-write
+  - [ ] Look for and run all the different run scripts
+  - [ ] WSS
+    - [ ] Auth
+    - [ ] Remove Zombie Connections
+    - [ ] Create password for server
+  - [x] Modpack
+    - [x] Download ( Not yet added to index )
+    - [ ] Save pack version
+    - [ ] Save pack modloader
+    - [ ] Add custom mods
+  - [ ] Accept EULA
+  - [ ] CLI options ( seperate files for each option )
+    - [ ] update
+    - [ ] run
+    - [ ] pswd
+    - [ ] config
+      - [ ] edit
+      - [ ] list
+  - [ ] add script to path
