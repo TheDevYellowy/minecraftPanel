@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      background: black;
+      width: 935px;
+      height: 595px;
+
+      padding: 0;
+      margin: 0;
+
+      overflow: hidden;
+    }
+    /* 290w x 440h */
+
+    div {
+      background: gray;
+      position: absolute;
+      width: 320px;
+      height: 440px;
+
+      left: 50%;
+      top: 50%;
+      margin-left: -160px;
+      margin-top: -220px;
+
+      border-radius: 15px;
+      text-align: center;
+    }
+    #id {
+      display: block;
+    }
+
+    input {
+      width: 80%;
+      padding: 7px;
+      margin-top: 8%;
+
+      color: white;
+
+      background: transparent;
+      outline: none;
+      border: black solid 1px;
+      border-radius: 5px;
+    }
+
+    input::placeholder {
+      color: white;
+    }
+
+    button {
+      transition: 1s;
+
+      background: transparent;
+      color: white;
+
+      border: solid black 1px;
+      border-radius: 5px;
+      margin-top: 55%;
+      
+      padding: 7px;
+      width: 60%;
+
+      font-size: xx-large;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: black;
+    }
+
+    #error {
+      display: none;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Login</h1>
+    <h3 id="error">Incorrect Ip / Password</h3>
+
+    <input placeholder="Server Ip" id="ip">
+    <input placeholder="Server Password" id="password">
+    <button id="login">Login</button>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+    const ip = document.getElementById('ip');
+    const password = document.getElementById("password");
+    const error = document.getElementById("error");
+
+    document.getElementById("login").addEventListener("click", () => {
+      ipcRenderer.send("login", { ip: ip.value, password: password.value });
+    })
+
+    ipcRenderer.on("wrong", () => {
+      error.style.display = "block";
+      document.getElementById("login").style.marginTop = "45% !important"
+    })
+  </script>
+</body>
+</html>

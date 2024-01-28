@@ -1,44 +1,48 @@
 "use strict";
 
-const { WebSocketServer } = require("ws");
-const fs = require("node:fs");
-const { spawn } = require("node:child_process");
-const path = require("node:path");
+console.clear();
+const { program } = require("commander");
 
-const wss = new WebSocketServer({ port: 25500 });
+program.version("0.0.1");
+const pkg = require("./package.json");
 
-const hardcoded = {
-  curseforgeKey: "$2a$10$I86S6MDkrvOjKvBafbwsOuJYVbBXR92vk6X/7DurN.PEaWMt01gDe",
-  curseforgeBase: "https://api.curseforge.com",
-};
+(async () => {
+  const test = await fetch(
+    "https://raw.githubusercontent.com/TheDevYellowy/mincraftPanel/main/server/package.json"
+  );
 
-const exists = fs.existsSync("./server");
-
-/** @type {import("node:child_process").ChildProcessWithoutNullStreams} */
-var mc;
-
-const lastOnline = {};
-const online = [];
-if (exists) {
-  let script = fs.readdirSync("./server").filter((file) => file == "run.sh")[0];
-  if (script == undefined) {
+  if (test.ok) {
+    const rawPackage = await test.json();
+    if (pkg.version !== rawPackage.version)
+      console.log(`There is a new update available you can get it by running "${pkg.name} update"`);
   }
 
-  mc = spawn(script, {
-    stdio: "pipe",
-    cwd: path.join(process.cwd(), "server"),
-  });
+  program
+    .command("pswd")
+    .description("sets the password that clients have to enter")
+    .argument("<password>")
+    .action((password) => {
+      require("./command/pswd")(password);
+    });
 
-  const regexpLog = /^\[(.*)]\s\[([^/]*)\/(.*)][^:]*:\s(.*)$/;
-  const leave = /^(.*)\sleft\sthe\sgame$/;
+  program
+    .command("config")
+    .description("edit or list the config")
+    .argument("<cmd>", "either edit or list")
+    .argument("[key]")
+    .argument("[value]")
+    .action((cmd, key, value) => {
+      if (!["edit", "list"].includes(cmd))
+        return console.log(`error: argument "${cmd}" is invalid. Choices are edit or list`);
+      require("./command/config")(cmd, key, value);
+    });
 
-  mc.stdout.on("data", (line) => {
-    line = line.toString();
-    if (!regexpLog.test(line)) return;
+  program
+    .command("update")
+    .description("updates the script")
+    .action(() => require("./update"));
 
-    const [log, time, causedAt, level, message] = regexpLog.exec(line);
-    if (causedAt !== "Server thread" || level !== "INFO") return;
-  });
-}
+  program.command("run", "run the server", { isDefault: true, executableFile: "command/run.js" });
 
-console.log(fs.readdirSync("./server").filter((file) => file == "run.sh")[0]);
+  program.parse();
+})();

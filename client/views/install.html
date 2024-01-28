@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+    integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    body {
+      background: black;
+      width: 935;
+      height: 595;
+
+      padding: 0;
+      margin: 0;
+
+      overflow: hidden;
+    }
+
+    a {
+      color: white;
+      text-decoration: solid;
+
+      cursor: pointer;
+    }
+
+    table {
+      width: 95%;
+    }
+
+    .mainContent {
+      position: absolute;
+      left: 220px;
+      top: 25px;
+      width: 72%;
+      height: 90%;
+
+      color: white;
+
+      background: rgb(70, 70, 70);
+      border-radius: 20px;
+
+      overflow: auto;
+    }
+
+    #settings button {
+      position: absolute;
+      background: transparent;
+      color: white;
+      outline: none;
+      border: black solid 2px;
+      border-radius: 10px;
+
+      cursor: pointer;
+
+      padding: 7px;
+      margin-top: 5px;
+      right: 5%;
+    }
+
+    .flex {
+      display: flex;
+      margin-top: 1%;
+    }
+
+    .notFlex {
+      display: relative;
+    }
+
+    .mainContent p {
+      margin-left: 15px;
+    }
+
+    select#class {
+      background: transparent;
+      color: white;
+      width: 15%;
+
+      margin-left: 2%;
+    }
+
+    select#class option {
+      background: rgb(70, 70, 70);
+      color: white;
+    }
+
+    select#class option:checked {
+      box-shadow: inset 0 0 10px 100px gray;
+    }
+
+    #name {
+      background: transparent;
+      color: white;
+      outline: none;
+      border: black solid 1px;
+
+      width: 60%;
+      margin-left: 5%;
+
+      border-radius: 5px;
+    }
+
+    #search {
+      background: black;
+      color: white;
+
+      padding: 3px;
+      outline: none;
+      border: black solid 1px;
+      border-radius: 5px;
+
+      margin-left: 2%;
+    }
+
+    .sidebar {
+      background-color: rgb(90, 90, 90);
+      height: 100%;
+      width: 185px;
+      position: absolute;
+
+      text-align: center;
+    }
+
+    .sidebar button {
+      text-align: left;
+      width: 80%;
+      margin-top: 20px;
+      padding: 5px;
+      background: none;
+      outline: none;
+      border: none;
+      border-radius: 10px;
+
+      cursor: pointer;
+      color: rgb(180, 180, 180);
+      transition: 0.5s;
+    }
+
+    .sidebar button:hover {
+      color: white;
+      transition: 0.5s;
+    }
+
+    .active {
+      background: gray !important;
+      color: white !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <button onclick="changeTab('index')"><i class="fa-solid fa-house"></i> Dashboard</button>
+    <button onclick="changeTab('players')"><i class="fa-solid fa-user"></i> Players</button>
+    <button onclick="changeTab('edit')"><i class="fa-solid fa-user-gear"></i> Edit Player</button>
+    <button onclick="changeTab('logs')"><i class="fa-solid fa-file-lines"></i> Server Logs</button>
+    <button onclick="changeTab('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
+    <button class="active" onclick="changeTab('install')"><i class="fa-solid fa-download"></i> Install</button>
+  </div>
+
+  <div class="mainContent">
+    <div class="flex">
+      <select id="class">
+        <option value="4471">Modpacks</option>
+        <option value="6">Mods</option>
+      </select>
+      <input id="name">
+      <button id="search">Search</button>
+    </div>
+    <br>
+    <br>
+    <table>
+      <tbody id="info">
+        
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+    const main = document.getElementById("info");
+
+    const select = document.getElementById("class");
+    const btn = document.getElementById("search");
+    const nameEle = document.getElementById("name");
+
+    ipcRenderer.on('response', (_, data) => {
+      main.innerHTML = "";
+
+      const type = data.class;
+      const version = data.version;
+      delete data.version;
+      delete data.class
+
+      if(type == "6") {
+        data.forEach(mod => {
+          const latest = mod.latestFiles.filter(f => f.id == mod.mainFileId)[0];
+          if(!latest.isAvailable) return;
+
+          const tr = document.createElement("tr");
+          const one = document.createElement("td");
+          const name = document.createElement("a");
+          name.style.marginLeft = "2%";
+          name.href = mod.links.websiteUrl;
+          name.target = "_blank"
+          name.innerText = mod.name;
+          one.appendChild(name);
+
+          const two = document.createElement("td");
+          const versionText = document.createElement("span");
+          const n = latest.gameVersions.filter(v => v.includes("."))[0];
+          versionText.innerText = `${version} ${n}`;
+          versionText.style.marginLeft = "1%";
+          two.appendChild(versionText);
+
+          const three = document.createElement("td");
+          const info = document.createElement("button");
+          info.innerText = "Download";
+          info.style.background = "transparent";
+          info.style.outline = "none";
+          info.style.border = "black solid 1px";
+          info.style.borderRadius = "5px";
+          info.style.color = "white";
+          info.style.marginLeft = "40%";
+          info.style.cursor = "pointer";
+          three.appendChild(info);
+
+          tr.append(one, two, three);
+          main.appendChild(tr);
+
+          info.addEventListener("click", () => {
+            ipcRenderer.send("downloadMod", {id: mod.id, fileId: latest.id});
+          })
+        })
+      } else {
+        data.forEach(pack => {
+          const latest = pack.latestFiles.filter(f => f.id == pack.mainFileId)[0];
+          if (!"serverPackFileId" in latest) return;
+
+          const tr = document.createElement("tr");
+
+          const one = document.createElement("td");
+          const name = document.createElement("a");
+          name.style.marginLeft = "2%";
+          name.href = pack.links.websiteUrl;
+          name.target = "_blank"
+          name.innerText = pack.name;
+          one.appendChild(name);
+
+          const two = document.createElement("td");
+          const versionText = document.createElement("span");
+          let t = latest.gameVersions.filter(v => !v.includes("."))[0];
+          const n = latest.gameVersions.filter(v => v.includes("."))[0];
+          if (t == undefined) t = "Forge";
+          versionText.innerText = `${t} ${n}`;
+          versionText.style.marginLeft = "1%";
+          two.appendChild(versionText);
+
+          const three = document.createElement("td");
+          const info = document.createElement("button");
+          info.innerText = "Download";
+          info.style.background = "transparent";
+          info.style.outline = "none";
+          info.style.border = "black solid 1px";
+          info.style.borderRadius = "5px";
+          info.style.color = "white";
+          info.style.marginLeft = "40%";
+          info.style.cursor = "pointer";
+          three.appendChild(info);
+
+          tr.append(one, two, three);
+          main.appendChild(tr);
+
+          info.addEventListener("click", () => {
+            ipcRenderer.send("downloadPack", pack);
+          })
+        });
+      }
+    });
+
+    nameEle.addEventListener("keypress", (ev) => {
+      if(ev.key == 'Enter') return btn.click();
+    });
+
+    btn.addEventListener("click", () => {
+      const name = nameEle.value;
+      const searchClass = select.value;
+
+      ipcRenderer.send("request", { name, class: searchClass });
+    });
+
+    function changeTab(file) {
+      ipcRenderer.send("changeTab", file);
+    }
+  </script>
+</body>
+
+</html>

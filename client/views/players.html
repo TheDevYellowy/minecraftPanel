@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+    integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    body {
+      background: black;
+      width: 935;
+      height: 595;
+
+      padding: 0;
+      margin: 0;
+
+      overflow: hidden;
+    }
+
+    .mainContent {
+      position: absolute;
+      left: 220px;
+      top: 25px;
+      width: 72%;
+      height: 90%;
+
+      color: white;
+
+      background: rgb(70, 70, 70);
+      border-radius: 20px;
+
+      overflow: hidden;
+    }
+
+    .mainContent div.notFlex {
+      display: block;
+    }
+
+
+    .mainContent div {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .mainContent h2,
+    .mainContent p {
+      margin-left: 15px;
+    }
+
+    .sidebar {
+      background-color: rgb(90, 90, 90);
+      height: 100%;
+      width: 185px;
+      position: absolute;
+
+      text-align: center;
+    }
+
+    .sidebar button {
+      text-align: left;
+      width: 80%;
+      margin-top: 20px;
+      padding: 5px;
+      background: none;
+      outline: none;
+      border: none;
+      border-radius: 10px;
+
+      cursor: pointer;
+      color: rgb(180, 180, 180);
+      transition: 0.5s;
+    }
+
+    .sidebar button:hover {
+      color: white;
+      transition: 0.5s;
+    }
+
+    .active {
+      background: gray !important;
+      color: white !important;
+    }
+
+    .offline {
+      position: relative;
+      background: black;
+      color: white;
+      padding: 8px;
+
+      right: 20px;
+      border-radius: 10px;
+    }
+
+    #count {
+      position: relative;
+      color: white;
+      right: 20px;
+    }
+
+    hr {
+      width: 95%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <button onclick="changeTab('index')"><i class="fa-solid fa-house"></i> Dashboard</button>
+    <button class="active" onclick="changeTab('players')"><i class="fa-solid fa-user"></i> Players</button>
+    <button onclick="changeTab('edit')"><i class="fa-solid fa-user-gear"></i> Edit Player</button>
+    <button onclick="changeTab('logs')"><i class="fa-solid fa-file-lines"></i> Server Logs</button>
+    <button onclick="changeTab('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
+    <button onclick="changeTab('install')"><i class="fa-solid fa-download"></i> Install</button>
+  </div>
+
+  <div class="mainContent">
+    <div>
+      <h2>Players</h2>
+      <span id="count"></span>
+    </div>
+  </div>
+  <script>
+
+    const { ipcRenderer } = require("electron");
+
+    ipcRenderer.on("data", (ev, args) => {
+      const data = args;
+      let total = data.properties["max-players"];
+      if (total == undefined) total = 0;
+      const numPlyers = data.online.length;
+
+      document.getElementById("count").innerText = `${numPlyers}/${total}`;
+      
+      const players = document.getElementsByClassName('mainContent')[0];
+      data.online.forEach(player => {
+        const div = document.createElement("div");
+        const ele = document.createElement("p");
+        ele.innerText = player;
+
+        const span = document.createElement("span");
+        span.innerText = "Online";
+
+        div.append(ele, span);
+
+        players.appendChild(div);
+      })
+
+      Object.keys(data.lastOnline).forEach(key => {
+        const div = document.createElement("div");
+
+        const name = document.createElement("p");
+        name.innerText = key;
+
+        const lastOnline = document.createElement("span");
+        lastOnline.innerText = `${new Date(data.lastOnline[key]).toDateString()}`;
+
+        div.appendChild(name);
+        div.appendChild(lastOnline);
+
+        players.appendChild(div);
+      });
+    });
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+        ipcRenderer.send("getData");
+      },
+      { once: true }
+    );
+
+    function changeTab(file) {
+      ipcRenderer.send("changeTab", file);
+    }
+  </script>
+</body>
+
+</html>
