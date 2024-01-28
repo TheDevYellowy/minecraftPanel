@@ -234,6 +234,7 @@
           })
         })
       } else {
+        console.log(data, typeof data);
         data.forEach(pack => {
           const latest = pack.latestFiles.filter(f => f.id == pack.mainFileId)[0];
           if (!"serverPackFileId" in latest) return;

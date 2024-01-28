@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <style>
     body {
@@ -12,6 +13,7 @@
 
       overflow: hidden;
     }
+
     /* 290w x 440h */
 
     div {
@@ -28,6 +30,7 @@
       border-radius: 15px;
       text-align: center;
     }
+
     #id {
       display: block;
     }
@@ -57,8 +60,8 @@
 
       border: solid black 1px;
       border-radius: 5px;
-      margin-top: 55%;
-      
+      margin-top: 10%;
+
       padding: 7px;
       width: 60%;
 
@@ -76,14 +79,14 @@
     }
   </style>
 </head>
+
 <body>
   <div>
-    <h1>Login</h1>
-    <h3 id="error">Incorrect Ip / Password</h3>
+    <h1>You need to agree to minecrafts EULA</h1>
+    <h3>You can find the <a href="https://aka.ms/MinecraftEULA" target="_blank">EULA here</a></h3>
 
-    <input placeholder="Server Ip" id="ip">
-    <input placeholder="Server Password" id="password">
-    <button id="login">Login</button>
+    <button id="yes">Agree</button>
+    <button id="no">Disagree</button>
   </div>
 
   <script>
@@ -92,14 +95,16 @@
     const password = document.getElementById("password");
     const error = document.getElementById("error");
 
-    document.getElementById("login").addEventListener("click", () => {
-      ipcRenderer.send("login", { ip: ip.value, password: password.value });
-    })
-
-    ipcRenderer.on("wrong", () => {
-      error.style.display = "block";
-      document.getElementById("login").style.marginTop = "45% !important";
+    document.addEventListener("click", async (ev) => {
+      const target = ev.target.id;
+      if(target == "yes") {
+        await ipcRenderer.send("eula");
+        window.close();
+      } else if (target == "no") {
+        window.close();
+      } else return;
     })
   </script>
 </body>
+
 </html>
