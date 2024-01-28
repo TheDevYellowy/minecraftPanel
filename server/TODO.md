@@ -1,5 +1,5 @@
 - [ ] Server Re-write
-  - [ ] Look for and run all the different run scripts
+  - [x] Look for and run all the different run scripts
   - [x] WSS
     - [x] Auth
     - [x] Remove Zombie Connections
@@ -9,7 +9,7 @@
     - [x] Save pack version
     - [x] Save pack modloader
     - [x] Add custom mods
-  - [ ] Accept EULA
+  - [x] Accept EULA
   - [ ] CLI options ( seperate files for each option )
     - [ ] update
     - [x] run

@@ -28,7 +28,7 @@ try {
 const wss = new WebSocketServer({ port: 25500 });
 
 const hardcoded = {
-  curseforgeKey: fs.readFileSync(path.join(process.cwd(), "key.txt")).toString(),
+  curseforgeKey: "$2a$10$I86S6MDkrvOjKvBafbwsOuJYVbBXR92vk6X/7DurN.PEaWMt01gDe",
   curseforgeBase: "https://api.curseforge.com",
 };
 
@@ -46,10 +46,13 @@ var needEula;
 function startServer() {
   let script = fs
     .readdirSync(path.join(process.cwd(), "server"))
-    .filter((file) => file == "run.bat")[0];
+    .filter((file) => file.includes("run") || file.includes("start"))
+    .filter((file) => file.endsWith(".sh"))[0];
   if (script == undefined) return;
 
-  mc = spawn(script, {
+  console.log(script);
+
+  mc = spawn(`./${script}`, {
     cwd: path.join(process.cwd(), "server"),
   });
   mc.stdout.setEncoding("utf8");
@@ -160,6 +163,23 @@ wss.on("connection", (socket) => {
             break;
           }
         }
+
+        case "eula":
+          if (!exists) fs.mkdirSync("server");
+          const date = new Date();
+          const dArr = date.toDateString().split(" ");
+          const tArr = date.toTimeString().split(" ");
+          const tz = tArr
+            .slice(2, 5)
+            .join("")
+            .split("")
+            .filter((c) => {
+              if (/[A-Z]/.test(c)) return /[A-Z]/.exec(c)[0];
+            })
+            .join("");
+          const text = `#${dArr[0]} ${dArr[1]} ${dArr[2]} ${tArr[0]} ${tz} ${dArr[3]}\neula=true`;
+          fs.writeFileSync(path.join(process.cwd(), "server", "eula.txt"), text);
+          break;
 
         case "command":
           if (serverOnline) mc.stdin.write(`${json.message}\n`);
@@ -300,6 +320,18 @@ async function download(id) {
       if (name == undefined && version == "1.12.2") name = "Forge";
 
       fs.writeFileSync(`${path.join(process.cwd(), "version.txt")}`, `${name} ${version}`);
+      if (fs.existsSync(path.join(process.cwd(), "server", "server.properties"))) {
+        const propString = fs
+          .readFileSync(path.join(process.cwd(), "server", "server.properties"))
+          .toString();
+
+        propString.split("\n").forEach((line) => {
+          if (line.startsWith("#")) return;
+
+          const [key, value] = line.split("=");
+          properties.set(key, value);
+        });
+      }
     } catch (error) {}
   } else {
     console.error(`curseforge request not ok: ${modpack.status}`);
@@ -358,7 +390,7 @@ async function downloadModpack(packId, fileId) {
         console.log("Extracting...");
         await decompress(data.fileName, serverFolder);
         const folders = fs.readdirSync(serverFolder);
-        if (folders.length == 1) {
+        if (folders.length < 5) {
           fs.readdirSync(path.join(serverFolder, folders[0])).forEach((file) => {
             fs.renameSync(path.join(serverFolder, folders[0], file), path.join(serverFolder, file));
           });
