@@ -1,8 +1,11 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "msm",
+  "version": "0.0.1-beta",
+  "main": "msm.js",
   "license": "MIT",
+  "scripts": {
+    "build": "pkg msm.js --targets latest-linux-x64,latest-win-x64 --out-path dist"
+  },
   "dependencies": {
     "cli-progress": "^3.12.0",
     "commander": "^11.1.0",
@@ -10,5 +13,8 @@
     "request": "^2.88.2",
     "request-progress": "^3.0.0",
     "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }

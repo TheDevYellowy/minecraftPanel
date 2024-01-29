@@ -1,6 +1,6 @@
 {
-  "name": "client",
-  "version": "1.0.0",
+  "name": "msm",
+  "version": "0.0.1-beta",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^7.2.0",
     "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
     "@electron-forge/maker-squirrel": "^7.2.0",
     "@electron-forge/maker-zip": "^7.2.0",
     "electron": "^28.1.4"
@@ -27,20 +28,10 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Minecraft Server Manager"
+            "name": "MSM",
+            "authors": "TheDevYellowy",
+            "description": "MSM is a server manager that allows the user to change the server.properties, install modpacks, and install aditional mods"
           }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": []
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
         }
       ]
     }

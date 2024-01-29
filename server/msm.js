@@ -40,7 +40,7 @@ const pkg = require("./package.json");
   program
     .command("update")
     .description("updates the script")
-    .action(() => require("./update"));
+    .action(() => require("./command/update"));
 
   program.command("run", "run the server", { isDefault: true, executableFile: "command/run.js" });
 

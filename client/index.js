@@ -1,10 +1,13 @@
 "use strict";
 
 console.clear();
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, autoUpdater, dialog } = require("electron");
 const { WebSocket } = require("ws");
 
 if (require("electron-squirrel-startup")) app.quit();
+
+const server = "https://hazel-orwy7toxy-thedevyellowy.vercel.app";
+const url = `${server}/update/${process.platform}/${app.getVersion()}`;
 
 /** @type {BrowserWindow} */
 var main;
@@ -24,6 +27,8 @@ const loaderType = {
 
 function createWindow() {
   main = new BrowserWindow({
+    title: "MSM",
+    autoHideMenuBar: true,
     width: 935,
     height: 595,
     webPreferences: {
@@ -162,3 +167,25 @@ function getURL() {
 app.whenReady().then(() => {
   createWindow();
 });
+
+if (app.isPackaged) {
+  autoUpdater.setFeedURL({ url });
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 60000);
+
+  autoUpdater.on("update-downloaded", (event, notes, name) => {
+    dialog
+      .showMessageBox(main, {
+        type: "info",
+        buttons: ["Restart", "Later"],
+        title: "An update is available",
+        message: notes,
+        detail: "A new version has been downloaded. Restart the application to apply the updates.",
+      })
+      .then((ret) => {
+        if (ret.response == 0) return autoUpdater.quitAndInstall();
+      });
+  });
+}

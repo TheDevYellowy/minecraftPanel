@@ -109,3 +109,5 @@ server/server_backup
 server/*.txt
 server/config.json
 server/lastOnline.json
+
+client/out
