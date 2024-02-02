@@ -4,7 +4,9 @@
   "main": "msm.js",
   "license": "MIT",
   "scripts": {
-    "build": "pkg msm.js --targets latest-linux-x64,latest-linux-arm64,latest-win-x64 --out-path dist"
+    "build:linux64": "pkg msm.js --targets latest-linux-x64 --output dist/msm-linux64",
+    "build:arm64": "pkg msm.js --targets latest-linux-arm64 --output dist/msm-arm64",
+    "build:win64": "pkg msm.js --targets latest-win-x64 --output dist/msm-win64"
   },
   "dependencies": {
     "cli-progress": "^3.12.0",
